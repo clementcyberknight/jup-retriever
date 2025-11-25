@@ -3,6 +3,9 @@
 ## Overview
 
 Jup Retriever is a Node.js application that fetches token information from the Jup API. It provides a simple API to retrieve details about various tokens on the Solana blockchain.
+
+To prevent hitting API rate limits, the application implements a **request queuing system**. Instead of rejecting requests when limits are reached, it queues them and processes one request per second, ensuring reliable delivery for all inquiries.
+
 Bro i just Built this for an AI Agent and to avoid rate limiting in otaku ai
 
 ## Project Structure
@@ -18,7 +21,8 @@ jup-retriever
 │   ├── routes
 │   │   └── tokenRoutes.js # API routes for fetching token information
 │   └── utils
-│       └── errorHandler.js # Error handling middleware
+│       ├── errorHandler.js # Error handling middleware
+│       └── requestQueue.js # Request queuing utility
 ├── package.json          # NPM configuration file
 └── README.md             # Project documentation
 ```
