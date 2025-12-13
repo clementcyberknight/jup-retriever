@@ -1,37 +1,5 @@
-const { JUP_API_BASE_URL } = require("../config/constants");
-
-async function fetchJupiterToken(mintAddress) {
-  try {
-    const response = await fetch(`${JUP_API_BASE_URL}/search?query=${mintAddress}`);
-    if (!response.ok) {
-        console.warn(`Jupiter fetch failed: ${response.statusText}`);
-        return null; 
-    }
-    const data = await response.json();
-    if (Array.isArray(data) && data.length > 0) {
-        return data[0]; 
-    }
-    return null;
-  } catch (error) {
-    console.warn(`Failed to fetch Jupiter info: ${error.message}`);
-    return null;
-  }
-}
-
-async function fetchDexScreenerToken(mintAddress) {
-  const url = `https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`;
-  try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.warn(`DexScreener fetch failed: ${response.status}`);
-        return null;
-      }
-      return await response.json();
-  } catch (error) {
-      console.warn(`Failed to fetch DexScreener info: ${error.message}`);
-      return null;
-  }
-}
+const { fetchJupiterToken } = require("./jupiterService");
+const { fetchDexScreenerToken } = require("./dexScreenerService");
 
 async function fetchTokenStandardized(mintAddress) {
   const jupPromise = fetchJupiterToken(mintAddress);

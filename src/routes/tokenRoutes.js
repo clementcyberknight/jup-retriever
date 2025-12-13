@@ -1,5 +1,5 @@
 const express = require("express");
-const { fetchTokenInfo } = require("../services/jupService");
+const { fetchTokenInfo } = require("../services/tokenService");
 const requestQueue = require("../utils/requestQueue");
 
 const router = express.Router();
