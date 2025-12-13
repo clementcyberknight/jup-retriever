@@ -3,7 +3,7 @@ const { fetchDexScreenerToken } = require("./dexScreenerService");
 
 async function fetchTokenStandardized(mintAddress) {
   const jupPromise = fetchJupiterToken(mintAddress);
-  const dexPromise = fetchDexScreenerToken(mintAddress);
+  const dexPromise = fetchDexScreenerToken(mintAddress);  
 
   const [jupData, dexData] = await Promise.all([jupPromise, dexPromise]);
 
