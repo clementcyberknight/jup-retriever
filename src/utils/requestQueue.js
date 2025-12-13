@@ -40,43 +40,20 @@ class RequestQueue {
 
         this.isProcessing = false;
     }
-}
 
-class PerIPRequestQueue {
-    constructor(intervalMs = 1000) {
-        this.queues = new Map();
-        this.intervalMs = intervalMs;
+    getQueueLength() {
+        return this.queue.length;
     }
 
-    add(ip, task) {
-        if (!this.queues.has(ip)) {
-            this.queues.set(ip, new RequestQueue(this.intervalMs));
-        }
-        return this.queues.get(ip).add(task);
-    }
-
-    getQueueStats(ip) {
-        const queue = this.queues.get(ip);
-        if (!queue) return { queueLength: 0, isProcessing: false };
+    getStats() {
         return {
-            queueLength: queue.queue.length,
-            isProcessing: queue.isProcessing
+            queueLength: this.queue.length,
+            isProcessing: this.isProcessing
         };
     }
-
-    getAllStats() {
-        const stats = {};
-        for (const [ip, queue] of this.queues.entries()) {
-            stats[ip] = {
-                queueLength: queue.queue.length,
-                isProcessing: queue.isProcessing
-            };
-        }
-        return stats;
-    }
 }
 
-const perIPRequestQueue = new PerIPRequestQueue(1000);
+const requestQueue = new RequestQueue(10000);
 
-module.exports = perIPRequestQueue;
+module.exports = requestQueue;
 

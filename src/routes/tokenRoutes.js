@@ -6,8 +6,7 @@ const router = express.Router();
 
 router.get("/", async (req, res, next) => {
   try {
-    const clientIP = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
-    const tokenInfo = await requestQueue.add(clientIP, () => fetchTokenInfo(req.query.query));
+    const tokenInfo = await requestQueue.add(() => fetchTokenInfo(req.query.query));
     res.json(tokenInfo);
   } catch (error) {
     next(error);
