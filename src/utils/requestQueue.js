@@ -6,11 +6,6 @@ class RequestQueue {
         this.lastProcessedTime = 0;
     }
 
-    /**
-     * Adds a task to the queue.
-     * @param {Function} task - A function that returns a promise (or value).
-     * @returns {Promise} - Resolves with the task's result.
-     */
     add(task) {
         return new Promise((resolve, reject) => {
             this.queue.push({ task, resolve, reject });
@@ -47,8 +42,41 @@ class RequestQueue {
     }
 }
 
-// Export a singleton instance for the application
-const requestQueue = new RequestQueue(1000);
+class PerIPRequestQueue {
+    constructor(intervalMs = 1000) {
+        this.queues = new Map();
+        this.intervalMs = intervalMs;
+    }
 
-module.exports = requestQueue;
+    add(ip, task) {
+        if (!this.queues.has(ip)) {
+            this.queues.set(ip, new RequestQueue(this.intervalMs));
+        }
+        return this.queues.get(ip).add(task);
+    }
+
+    getQueueStats(ip) {
+        const queue = this.queues.get(ip);
+        if (!queue) return { queueLength: 0, isProcessing: false };
+        return {
+            queueLength: queue.queue.length,
+            isProcessing: queue.isProcessing
+        };
+    }
+
+    getAllStats() {
+        const stats = {};
+        for (const [ip, queue] of this.queues.entries()) {
+            stats[ip] = {
+                queueLength: queue.queue.length,
+                isProcessing: queue.isProcessing
+            };
+        }
+        return stats;
+    }
+}
+
+const perIPRequestQueue = new PerIPRequestQueue(1000);
+
+module.exports = perIPRequestQueue;
 
