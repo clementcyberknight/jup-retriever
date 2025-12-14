@@ -6,7 +6,12 @@ const router = express.Router();
 
 router.get("/", async (req, res, next) => {
   try {
-    const tokenInfo = await requestQueue.add(() => fetchTokenInfo(req.query.query));
+    const query = req.query.query;
+    if (!query) {
+      return res.status(400).json({ error: "query parameter is required" });
+    }
+
+    const tokenInfo = await requestQueue.add(() => fetchTokenInfo(query));
     res.json(tokenInfo);
   } catch (error) {
     next(error);

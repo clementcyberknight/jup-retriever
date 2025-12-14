@@ -1,21 +1,32 @@
 const { JUP_API_BASE_URL } = require("../config/constants");
 
-async function fetchJupiterToken(mintAddress) {
+/**
+ * Search Jupiter tokens by symbol, name, or mint address.
+ * Accepts comma-separated queries for batch lookups (up to 100 mints).
+ */
+async function searchJupiterTokens(query) {
   try {
-    const response = await fetch(`${JUP_API_BASE_URL}/search?query=${mintAddress}`);
+    const encodedQuery = encodeURIComponent(query);
+    const response = await fetch(`${JUP_API_BASE_URL}/search?query=${encodedQuery}`);
     if (!response.ok) {
-        console.warn(`Jupiter fetch failed: ${response.statusText}`);
-        return null; 
+      console.warn(`Jupiter search failed: ${response.statusText}`);
+      return [];
     }
     const data = await response.json();
-    if (Array.isArray(data) && data.length > 0) {
-        return data[0]; 
-    }
-    return null;
+    return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.warn(`Failed to fetch Jupiter info: ${error.message}`);
-    return null;
+    console.warn(`Failed to search Jupiter: ${error.message}`);
+    return [];
   }
 }
 
-module.exports = { fetchJupiterToken };
+/**
+ * Convenience wrapper to fetch a single token. Uses the search endpoint
+ * and returns the first match, or null if none found.
+ */
+async function fetchJupiterToken(mintAddress) {
+  const results = await searchJupiterTokens(mintAddress);
+  return results.length > 0 ? results[0] : null;
+}
+
+module.exports = { fetchJupiterToken, searchJupiterTokens };
