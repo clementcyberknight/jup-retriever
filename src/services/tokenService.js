@@ -5,7 +5,12 @@ async function fetchTokenStandardized(mintAddress) {
   const jupPromise = fetchJupiterToken(mintAddress);
   const dexPromise = fetchDexScreenerToken(mintAddress);  
 
-  const [jupData, dexData] = await Promise.all([jupPromise, dexPromise]);
+  let jupData, dexData;
+  try {
+    [jupData, dexData] = await Promise.all([jupPromise, dexPromise]);
+  } catch (error) {
+    console.error(`Error fetching upstream data for ${mintAddress}:`, error);
+  }
 
   let bestPair = null;
   if (dexData && dexData.pairs && dexData.pairs.length > 0) {
@@ -153,9 +158,11 @@ async function fetchTokenStandardized(mintAddress) {
   }
 
   if (!result.symbol && !result.name) {
+      console.error(`Failed to fetch token data for ${mintAddress}: Data incomplete`);
       return null;
   }
 
+  console.log(`${result.name} price is at ${result.usdPrice} and mcap of ${result.mcap} was found`);
   return result;
 }
 
