@@ -28,6 +28,11 @@ async function fetchTokenStandardized(mintAddress) {
     fdv: 0,
     liquidity: 0,
     
+    totalSupply: null,
+    circulatingSupply: null,
+    tags: [],
+    isVerified: false,
+
     priceChange: {
       m5: 0, h1: 0, h6: 0, h24: 0
     },
@@ -104,11 +109,28 @@ async function fetchTokenStandardized(mintAddress) {
   if (jupData) {
     if (!result.symbol) result.symbol = jupData.symbol;
     if (!result.name) result.name = jupData.name;
-    if (!result.icon) result.icon = jupData.logoURI || jupData.icon;
+    // Prioritize Jupiter icon, but keep DexScreener (info.imageUrl) as fallback if Jup is missing
+    const jupIcon = jupData.logoURI || jupData.icon;
+    if (jupIcon) {
+        result.icon = jupIcon;
+    }
     
     result.decimals = jupData.decimals;
     result.numberOfHolders = jupData.holderCount || 0;
     
+    // Fallbacks for price/market data if missing from DexScreener
+    if (!result.usdPrice && jupData.usdPrice) result.usdPrice = jupData.usdPrice;
+    if (!result.mcap && jupData.mcap) result.mcap = jupData.mcap;
+    if (!result.fdv && jupData.fdv) result.fdv = jupData.fdv;
+    // Note: Jupiter liquidity might be aggregated, but we can use it as fallback
+    if (!result.liquidity && jupData.liquidity) result.liquidity = jupData.liquidity;
+
+    // Additional Fields
+    if (jupData.totalSupply) result.totalSupply = jupData.totalSupply;
+    if (jupData.circSupply) result.circulatingSupply = jupData.circSupply;
+    if (jupData.tags) result.tags = jupData.tags;
+    if (jupData.isVerified !== undefined) result.isVerified = jupData.isVerified;
+
     if (jupData.audit && jupData.audit.topHoldersPercentage) {
         result.topHolders = jupData.audit.topHoldersPercentage;
     }
