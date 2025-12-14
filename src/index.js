@@ -1,10 +1,16 @@
 const express = require("express");
 const tokenRoutes = require("./routes/tokenRoutes");
 const errorHandler = require("./utils/errorHandler");
+const requestQueue = require("./utils/requestQueue");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+app.get("/health", (req, res) => {
+  res.json(requestQueue.getStats());
+});
+
 app.use("/api/tokens", tokenRoutes);
 app.use(errorHandler);
 

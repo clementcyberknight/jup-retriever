@@ -7,6 +7,7 @@ class RequestQueue {
     }
 
     add(task) {
+        console.log(`Task added to queue. Queue length: ${this.queue.length + 1}`);
         return new Promise((resolve, reject) => {
             this.queue.push({ task, resolve, reject });
             this.process();
@@ -29,6 +30,7 @@ class RequestQueue {
 
             const { task, resolve, reject } = this.queue.shift();
             this.lastProcessedTime = Date.now();
+            console.log(`Processing task. Remaining queue length: ${this.queue.length}`);
 
             try {
                 const result = await task();
@@ -48,7 +50,8 @@ class RequestQueue {
     getStats() {
         return {
             queueLength: this.queue.length,
-            isProcessing: this.isProcessing
+            isProcessing: this.isProcessing,
+            processingCount: this.isProcessing ? 1 : 0
         };
     }
 }
